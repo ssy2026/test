@@ -22,7 +22,7 @@
   <canvas id="c"></canvas>
 
   <script src="particles.js"></script>
-  <script src="interaction.js"></script>
+  <script src="performance-monitor.js"></script>
   <script>
     const canvas = document.getElementById('c');
     const ps = new ParticleSystem(canvas, {
@@ -31,8 +31,8 @@
       maxConnections: 3,
       speed: 1
     });
-    initInteraction(ps);
     ps.start();
+    initPerformanceMonitor(ps);
   </script>
 </body>
 </html>
