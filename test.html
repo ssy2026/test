@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particle Network – Test Suite</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0b0b0f; color: #e0e0e0; margin: 0; padding: 2rem; }
+    #results { max-width: 800px; margin: 0 auto; }
+    .pass { color: #6ee7b7; }
+    .fail { color: #fca5a5; }
+    h1 { font-size: 1.5rem; font-weight: 600; }
+    .summary { margin-top: 1.5rem; padding: 1rem; border-radius: 0.5rem; background: #1a1a24; }
+    .test-item { padding: 0.5rem 0; border-bottom: 1px solid #1f1f2e; }
+    .test-item:last-child { border-bottom: none; }
+    canvas { display: none; }
+  </style>
+</head>
+<body>
+  <canvas id="test-canvas" width="800" height="600"></canvas>
+  <div id="results">
+    <h1>Particle Network – Test Suite</h1>
+    <div id="summary" class="summary">Running…</div>
+    <div id="tests"></div>
+  </div>
+  <script src="utils.js"></script>
+  <script src="particles.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      const results = document.getElementById('tests');
+      const summary = document.getElementById('summary');
+      let passed = 0;
+      let failed = 0;
+
+      function test(name, fn) {
+        const el = document.createElement('div');
+        el.className = 'test-item';
+        try {
+          fn();
+          el.innerHTML = `<span class="pass">✓</span> ${name}`;
+          passed++;
+        } catch (e) {
+          el.innerHTML = `<span class="fail">✗</span> ${name} – ${e.message}`;
+          failed++;
+        }
+        results.appendChild(el);
+      }
+
+      function assert(condition, message) {
+        if (!condition) throw new Error(message || 'Assertion failed');
+      }
+
+      function assertEqual(actual, expected, message) {
+        if (actual !== expected) {
+          throw new Error(message || `Expected ${expected}, got ${actual}`);
+        }
+      }
+
+      function assertClose(actual, expected, tolerance = 1e-6, message) {
+        if (Math.abs(actual - expected) > tolerance) {
+          throw new Error(message || `Expected ${expected}, got ${actual}`);
+        }
+      }
+
+      // --- MathUtils tests ---
+      test('MathUtils.clamp clamps values', () => {
+        assertEqual(MathUtils.clamp(5, 0, 10), 5);
+        assertEqual(MathUtils.clamp(-1, 0, 10), 0);
+        assertEqual(MathUtils.clamp(15, 0, 10), 10);
+      });
+
+      test('MathUtils.lerp interpolates', () => {
+        assertEqual(MathUtils.lerp(0, 10, 0.5), 5);
+        assertEqual(MathUtils.lerp(0, 10, 0), 0);
+        assertEqual(MathUtils.lerp(0, 10, 1), 10);
+      });
+
+      test('MathUtils.distSq computes squared distance', () => {
+        assertEqual(MathUtils.distSq(0, 0, 3, 4), 25);
+        assertEqual(MathUtils.distSq(1, 1, 1, 1), 0);
+      });
+
+      test('MathUtils.map maps and clamps', () => {
+        assertEqual(MathUtils.map(5, 0, 10, 0, 100), 50);
+        assertEqual(MathUtils.map(-5, 0, 10, 0, 100), 0);
+        assertEqual(MathUtils.map(15, 0, 10, 0, 100), 100);
+      });
+
+      // --- ColorUtils tests ---
+      test('ColorUtils.hslToRgb converts correctly', () => {
+        const rgb = ColorUtils.hslToRgb(0, 100, 50);
+        assertEqual(rgb.r, 255);
+        assertEqual(rgb.g, 0);
+        assertEqual(rgb.b, 0);
+      });
+
+      test('ColorUtils.hexToRgb parses hex colors', () => {
+        const rgb = ColorUtils.hexToRgb('#ff0000');
+        assertEqual(rgb.r, 255);
+        assertEqual(rgb.g, 0);
+        assertEqual(rgb.b, 0);
+      });
+
+      // --- ParticleSystem tests ---
+      test('ParticleSystem initializes with correct particle count', () => {
+        const canvas = document.getElementById('test-canvas');
+        const ps = new ParticleSystem(canvas, { count: 42 });
+        assertEqual(ps.particles.length, 42);
+        ps.stop();
+      });
+
+      test('ParticleSystem respects custom config', () => {
+        const canvas = document.getElementById('test-canvas');
+        const ps = new ParticleSystem(canvas, { count: 10, connectDistance: 200 });
+        assertEqual(ps.config.count, 10);
+        assertEqual(ps.config.connectDistance, 200);
+        ps.stop();
+      });
+
+      test('ParticleSystem start/stop toggles running state', () => {
+        const canvas = document.getElementById('test-canvas');
+        const ps = new ParticleSystem(canvas, { count: 5 });
+        ps.start();
+        assert(ps.running, 'should be running after start');
+        ps.stop();
+        assert(!ps.running, 'should not be running after stop');
+      });
+
+      // Summary
+      const total = passed + failed;
+      summary.innerHTML = `<strong>${passed}/${total}</strong> tests passed` +
+        (failed > 0 ? ` – <span class="fail">${failed} failed</span>` : '');
+      summary.style.background = failed > 0 ? '#2a1a1a' : '#1a2a1a';
+    })();
+  </script>
+</body>
+</html>
