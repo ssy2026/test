@@ -21,17 +21,25 @@
 <body>
   <canvas id="c"></canvas>
 
+  <script src="config.js"></script>
   <script src="particles.js"></script>
+  <script src="interaction.js"></script>
   <script src="performance-monitor.js"></script>
   <script>
     const canvas = document.getElementById('c');
+    const config = window.PARTICLE_CONFIG || {};
     const ps = new ParticleSystem(canvas, {
-      count: 200,
-      connectDistance: 120,
-      maxConnections: 3,
-      speed: 1
+      count: config.count,
+      connectDistance: config.connectDistance,
+      maxConnections: config.maxConnections,
+      backgroundColor: config.backgroundColor,
+      lineColor: config.lineColor,
+      speed: config.speed
     });
     ps.start();
+    if (typeof initInteraction === 'function') {
+      initInteraction(ps);
+    }
     initPerformanceMonitor(ps);
   </script>
 </body>
