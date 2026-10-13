@@ -1,46 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Particle Network</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>粒子网络 · Particle Network</title>
   <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      overflow: hidden;
-      background: #0b0b0f;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0b0f; }
+    canvas { display: block; }
+    .test-entry {
+      position: fixed; top: 8px; left: 8px; z-index: 30;
+      padding: 5px 10px; font: 12px/1.4 monospace;
+      color: rgba(150, 180, 220, 0.5);
+      background: rgba(10, 10, 18, 0.6);
+      border: 1px solid rgba(100, 180, 255, 0.12);
+      border-radius: 6px; text-decoration: none;
+      transition: color 0.2s, border-color 0.2s;
     }
-    canvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
+    .test-entry:hover {
+      color: rgba(180, 210, 255, 0.9);
+      border-color: rgba(100, 180, 255, 0.35);
     }
   </style>
 </head>
 <body>
-  <canvas id="c"></canvas>
+  <a class="test-entry" href="test.html" target="_blank" rel="noopener">测试套件 →</a>
+  <canvas id="particle-canvas"></canvas>
 
+  <!-- 核心模块（按依赖顺序加载） -->
+  <script src="utils.js"></script>
   <script src="config.js"></script>
   <script src="particles.js"></script>
   <script src="interaction.js"></script>
   <script src="performance-monitor.js"></script>
-  <script>
-    const canvas = document.getElementById('c');
-    const config = window.PARTICLE_CONFIG || {};
-    const ps = new ParticleSystem(canvas, {
-      count: config.count,
-      connectDistance: config.connectDistance,
-      maxConnections: config.maxConnections,
-      backgroundColor: config.backgroundColor,
-      lineColor: config.lineColor,
-      speed: config.speed
-    });
-    ps.start();
-    if (typeof initInteraction === 'function') {
-      initInteraction(ps);
-    }
-    initPerformanceMonitor(ps);
-  </script>
+  <script src="presets.js"></script>
+
+  <!-- 演示入口：串联所有模块 -->
+  <script src="demo.js"></script>
 </body>
 </html>
